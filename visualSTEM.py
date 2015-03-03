@@ -25,7 +25,6 @@ with open(fnameJsSTEM, 'wb') as javaScriptFile:
         d = {'lat':[],'lon':[],'timeStamp':[]}
         df = pd.DataFrame(d)
 
-
         index = 1
         count = 0
         #Go through the csv file to complete the pandas dataFrame
@@ -44,7 +43,6 @@ with open(fnameJsSTEM, 'wb') as javaScriptFile:
                     #Sort the dataFrame considering the timeStamp
         print "Number of points : ", count
         df = df.sort(['timeStamp'])
-                    #print df
         LatLngArray = []
         #Fill an LatLng Array (usefull for Leaflet)
         for i in range(len(df) - 1):
@@ -56,11 +54,6 @@ with open(fnameJsSTEM, 'wb') as javaScriptFile:
             tmp.append(df.loc[i].timeStamp)
             LatLngArray.append(tmp)
 
-        #Write the variables on a file
-        javaScriptFile.write('var LatLngArray_' + str(n) + ' = ')
-        dictLatLngArrays['LatLngArray_' + str(n)] = LatLngArray
-        javaScriptFile.write(str(LatLngArray))
-        javaScriptFile.write('\n')
         dictionary = {}
         geo_data = {
             'type': 'FeatureCollection',
@@ -81,8 +74,5 @@ with open(fnameJsSTEM, 'wb') as javaScriptFile:
             geo_data['features'].append(feature)
         varname = 'user_' + str(n)
         dictResults[varname] = geo_data
-        javaScriptFile.write('var ' + varname + ' = ')
-        json.dump(geo_data, javaScriptFile, indent=2)
-        javaScriptFile.write('\n')
     javaScriptFile.write('var ' + 'dictResults' + ' = ' + str(dictResults) + '\n')
     javaScriptFile.write('var ' + 'dictLatLngArrays' + ' = ' + str(dictLatLngArrays) + '\n')

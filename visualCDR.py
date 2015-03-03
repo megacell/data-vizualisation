@@ -4,7 +4,6 @@ import random
 
 #Read a CSV file of 100 users on 04/16
 fnameCDR = 'data/sample_users_all_type_0416_smaller.csv'
-fnameSTEM = 'data/stem_sample_users_09_02_smaller.csv'
 with open(fnameCDR) as f:
     content = f.readlines()
 print content[0]
