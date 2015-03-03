@@ -86,44 +86,27 @@
     }
 
   function putMapForOneUser(user_id){
-
+    console.log('Start map for user ' + user_id)
     var myIcon = L.icon({
       iconUrl: 'user-red.png'
     });
 
-    var tracks = L.geoJson(dictResults['user_' + user_id], {style: style,
-      onEachFeature: markerSetup,
-      pointToLayer: function (feature, latlng) {
-        return L.circleMarker(jitter(latlng));
-      }
-    });
 
-    tracks.addTo(map);
-
-    //Compute the distance max between the points
-    var lonMax = tracks.getBounds()['_southWest']['lng'];
-    var latMax = tracks.getBounds()['_southWest']['lat'];
-    var lonMin = tracks.getBounds()['_northEast']['lng'];
-    var latMin = tracks.getBounds()['_northEast']['lat'];
-    var distanceMax = Math.pow(latMax - latMin,2) + Math.pow(lonMax - lonMin,2);
-
-    //Focus the map on the points
-    map.fitBounds(tracks.getBounds(), { padding: [30, 30] });
-
-    var currentArray = dictLatLngArrays['LatLngArray_' + user_id];
+    var currentArray = dictLatLngArrays['user_' + user_id];
 
     var count2 = 0;
 
     function doSetTimeout(cellPath,i,timeStamp,current) {
-      console.log(count2++);
+      console.log(i);
       setTimeout(function(){
         cellPath.addTo(map);
         document.getElementById("timeStampHeader").innerHTML = timeStamp;
         },speed*i);
     }
+
     var biggestDistance = 0;
     var count = 0;
-    for(var i = 0; i < currentArray.length - 1;i ++){
+    /*for(var i = 0; i < currentArray.length - 1;i ++){
       var current = []
       current[0] = currentArray[i][0];
       current[1] = currentArray[i+1][0];
@@ -162,10 +145,32 @@
       }
 
     }
+    */
+
+    var tracks = L.geoJson(dictResults['user_' + user_id], {style: style,
+      onEachFeature: markerSetup,
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(jitter(latlng));
+      }
+    });
+
+    //Compute the distance max between the points
+    var lonMax = tracks.getBounds()['_southWest']['lng'];
+    var latMax = tracks.getBounds()['_southWest']['lat'];
+    var lonMin = tracks.getBounds()['_northEast']['lng'];
+    var latMin = tracks.getBounds()['_northEast']['lat'];
+    var distanceMax = Math.pow(latMax - latMin,2) + Math.pow(lonMax - lonMin,2);
+
+    //Focus the map on the points
+
+
+    map.fitBounds(tracks.getBounds(), { padding: [30, 30] });
+    tracks.addTo(map);
+
     console.log("distance max " + distanceMax);
     console.log("Biggest distance " + biggestDistance);
   }
-  //putMapForOneUser('4');
+  putMapForOneUser('4');
 </script>
 
 </body>

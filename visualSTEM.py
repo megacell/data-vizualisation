@@ -53,7 +53,6 @@ with open(fnameJsSTEM, 'wb') as javaScriptFile:
             tmp.append(tmpLatLon)
             tmp.append(df.loc[i].timeStamp)
             LatLngArray.append(tmp)
-
         dictionary = {}
         geo_data = {
             'type': 'FeatureCollection',
@@ -73,6 +72,7 @@ with open(fnameJsSTEM, 'wb') as javaScriptFile:
                 }
             geo_data['features'].append(feature)
         varname = 'user_' + str(n)
+        dictLatLngArrays[varname] = LatLngArray
         dictResults[varname] = geo_data
     javaScriptFile.write('var ' + 'dictResults' + ' = ' + str(dictResults) + '\n')
     javaScriptFile.write('var ' + 'dictLatLngArrays' + ' = ' + str(dictLatLngArrays) + '\n')
