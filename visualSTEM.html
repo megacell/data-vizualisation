@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<!-- Leaflet demo adapted from these sources:
+http://zevross.com/blog/2014/10/28/tips-for-creating-leafleft-js-maps/
+http://leafletjs.com/examples/geojson.html -->
+
+<html>
+<head>
+  <title>Visualisation for 1 user</title>
+
+  <link rel='stylesheet' href='http://cdn.leafletjs.com/leaflet-0.7/leaflet.css' />
+  <script src='http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js'></script>
+  <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js'></script>
+  <script src='https://code.jquery.com/jquery-2.1.1.js'></script>
+  <script type="text/javascript" src='MovingMarker.js'></script>
+
+  <script src='visualDataSTEM.js'></script>
+
+  <style type='text/css'>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, sans-serif;
+  }
+  #map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+  }
+  #overlay {
+    position: absolute;
+    top: 40px;
+    left: 80px;
+    padding: 20px;
+    background-color: rgba(255,255,255,0.9);
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .button{
+    font-weight: bold;
+
+  }
+  #timeStampHeader{
+    top: 0px;
+    left: 80px;
+    padding: 20px;
+    background-color: rgba(255,255,255,0.9);
+    font-size: 24px;
+    font-weight: bold;
+    font-weight: bold;}
+  </style>
+
+</head>
+<body>
+<p id="timeStampHeader"> '2014-09-02 23:53:45-07:00'</p>
+<div id="map" style="height: 550px; position: relative;"></div>
+  <div id="overlaya">Visual for 1 user</div>
+  <form NAME="userChoice">
+  	<div>Enter a user number (between 0 and 97)</div>
+      <input TYPE="text" NAME="input" VALUE=""><BR>
+      <input TYPE="button" id='submitButton' NAME="bouton" VALUE="Get track for one day" onClick="controle(userChoice)">
+    </form>
+    <input type='button' value='Faster' onClick='increaseSpeed()' class='button'></input>
+  <script type="text/javascript">
+  var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.map-i87786ca/{z}/{x}/{y}.png', {
+    attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+  });
+
+  var map = L.map('map')
+  .addLayer(mapboxTiles);
+  //.setView([34.0204989,-118.4117325], 10);
+  L.control.scale().addTo(map);
+
+  //*********************************************************
+  // EDIT 'examples.map-i87786ca' TO CHANGE THE MAPBOX BASE LAYER
+  //*********************************************************
+
+  function getColor(d) {
+    return d > '2014-04-16 9:52:17-07:00'   ? '#00FF00' :
+    '#800026';
+  }
+
+  function markerSetup(feature, layer) {
+    if (feature.properties) {
+      layer.bindPopup(feature.properties.timeStamp);
+    }
+  }
+
+  function jitter(latlng) {
+    var lat = latlng.lat + (Math.random()-0.5)/500;
+    var lng = latlng.lng + (Math.random()-0.5)/500;
+    return L.latLng(lat, lng);
+  }
+
+
+  function style(feature) {
+    return {
+      fillColor: getColor(feature.properties.timeStamp),
+      weight: 2,
+      radius: 8,
+      opacity: 1,
+      color: 'white',
+      dashArray: '3',
+      fillOpacity: 0.7
+    };
+  }
+
+
+  function controle(userChoice) {
+    var user_id = document.userChoice.input.value;
+    //alert("Vous avez choisi le user : " + user_id);
+    putMapForOneUser(user_id);
+  }
+
+  var speed = 100;
+  var interval = 1;
+  function increaseSpeed(){
+    speed -= 100;
+  }
+
+  function putMapForOneUser(user_id){
+
+    var myIcon = L.icon({
+      //iconUrl: 'icon_phone.png'
+      iconUrl: 'user-red.png'
+    });
+
+    var tracks = L.geoJson(dictResults['user_' + user_id], {style: style,
+      onEachFeature: markerSetup,
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(jitter(latlng));
+      }
+    });
+
+    tracks.addTo(map);
+    var lonMax = tracks.getBounds()['_southWest']['lng'];
+    var latMax = tracks.getBounds()['_southWest']['lat'];
+    var lonMin = tracks.getBounds()['_northEast']['lng'];
+    var latMin = tracks.getBounds()['_northEast']['lat'];
+
+    var distanceMax = Math.pow(latMax - latMin,2) + Math.pow(lonMax - lonMin,2);
+
+    map.fitBounds(tracks.getBounds(), { padding: [30, 30] });
+
+    var currentArray = dictLatLngArrays['LatLngArray_' + user_id];
+
+    var count2 = 0;
+    function doSetTimeout(cellPath,i,timeStamp,current) {
+      console.log(count2++);
+      setTimeout(function(){
+        cellPath.addTo(map);
+        document.getElementById("timeStampHeader").innerHTML = timeStamp;
+        //var marker1 = L.Marker.movingMarker(current,
+        //                [20000],{autostart: false}).addTo(map);
+        },speed*i);
+    }
+    var biggestDistance = 0;
+    var count = 0
+    for(var i = 0; i < currentArray.length - 1;i ++){
+      var current = []
+      current[0] = currentArray[i][0];
+      current[1] = currentArray[i+1][0];
+      var lat1 = current[0][0]
+      var lat2 = current[1][0]
+      var lon1 = current[0][1]
+      var lon2 = current[1][1]
+      var distance = (Math.pow(lat1 - lat2,2) + Math.pow(lon1 - lon2,2)) * Math.pow(10,2);
+      console.log(distance);
+      if (distance > biggestDistance){
+        biggestDistance = distance;
+      }
+      var nbPoints = Math.floor(distance / interval);
+      console.log('numberOfPoints ' + nbPoints);
+      if (nbPoints > 0){
+        console.log('######');
+        for (var i = 0; i < nbPoints; i++){
+          var timeStamp = currentArray[i][1];
+          current[0] = [lat1 + (lat2 - lat1)*(i/nbPoints),lon1 + (lon2 - lon1)*(i/nbPoints)];
+          current[1] = [lat1 + (lat2 - lat1)*((i+1)/nbPoints),lon1 + (lon2 - lon1)*((i+1)/nbPoints)];
+          var cellPath = L.polyline(current,{color: 'red'});
+          doSetTimeout(cellPath,count,timeStamp,current);
+          count += 1;
+        }
+        current[0] = [lat1 + (lat2 - lat1)*(i/nbPoints),lon1 + (lon2 - lon1)*(i/nbPoints)];
+        current[1] = currentArray[i+1][0];
+        var cellPath = L.polyline(current,{color: 'red'});
+        doSetTimeout(cellPath,count,timeStamp,current);
+        count += 1;
+      }
+      else {
+        var timeStamp = currentArray[i][1];
+        var cellPath = L.polyline(current, {color: 'red'});
+        doSetTimeout(cellPath,count,timeStamp,current);
+        count += 1;
+      }
+
+    }
+    console.log("distance max " + distanceMax);
+    console.log("Biggest distance " + biggestDistance);
+  }
+  putMapForOneUser('4');
+</script>
+
+</body>
+</html>

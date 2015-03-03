@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<!-- Leaflet demo adapted from these sources:
+http://zevross.com/blog/2014/10/28/tips-for-creating-leafleft-js-maps/
+http://leafletjs.com/examples/geojson.html -->
+
+<html>
+<head>
+  <title>Visualisation for 1 user</title>
+
+  <link rel='stylesheet' href='http://cdn.leafletjs.com/leaflet-0.7/leaflet.css' />
+  <script src='http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js'></script>
+  <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js'></script>
+  <script src='https://code.jquery.com/jquery-2.1.1.js'></script>
+  <script src="/Users/Saraf/Documents/GSR/Visual/Leaflet.AnimatedMarker-master/src/AnimatedMarker.js"></script>
+
+  <script src='data/visualDataCDR.js'></script>
+  <style type='text/css'>
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, sans-serif;
+  }
+  #map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+  }
+  #overlay {
+    position: absolute;
+    top: 10px;
+    left: 80px;
+    padding: 20px;
+    background-color: rgba(255,255,255,0.9);
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  </style>
+</head>
+<body>
+  <div id="map" style="height: 500px; position: relative;"></div>
+  <div id="overlay">Visual for 1 user</div>
+  <form NAME="userChoice">
+  	<div>Enter a user number (between 0 and 97)</div>
+    <input TYPE="text" NAME="input" VALUE=""><BR>
+      <input TYPE="button" NAME="bouton" VALUE="Get track for one day" onClick="controle(userChoice)">
+    </form>
+  <script type="text/javascript">
+
+  //*********************************************************
+  // EDIT 'examples.map-i87786ca' TO CHANGE THE MAPBOX BASE LAYER
+  //*********************************************************
+
+
+
+  function getColor(d) {
+    return d > '2014-04-16 9:52:17-07:00'   ? '#00FF00' :
+    '#800026';
+  }
+
+  function markerSetup(feature, layer) {
+    if (feature.properties) {
+      layer.bindPopup(feature.properties.timeStamp + '<br/>' + feature.properties.trackType);
+    }
+  }
+
+  function jitter(latlng) {
+    var lat = latlng.lat + (Math.random()-0.5)/500;
+    var lng = latlng.lng + (Math.random()-0.5)/500;
+    return L.latLng(lat, lng);
+  }
+
+
+  function style(feature) {
+    return {
+      fillColor: getColor(feature.properties.timeStamp),
+      weight: 2,
+      radius: 8,
+      opacity: 1,
+      color: 'white',
+      dashArray: '3',
+      fillOpacity: 0.7
+    };
+  }
+
+
+  function controle(userChoice) {
+    var user_id = document.userChoice.input.value;
+    alert("Vous avez choisi le user : " + user_id);
+    putMapForOneUser(user_id);
+  }
+
+  function putMapForOneUser(user_id){
+    var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.map-i87786ca/{z}/{x}/{y}.png', {
+      attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+    });
+
+    var map = L.map('map')
+    .addLayer(mapboxTiles)
+    .setView([34.0204989,-118.4117325], 10);
+    var myIcon = L.icon({
+      iconUrl: 'user-red.png'
+    });
+
+    var tracks = L.geoJson(dictResults['user_' + user_id], {style: style,
+      onEachFeature: markerSetup,
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(jitter(latlng));
+      }
+    });
+
+    var cellPath = L.polyline(dictLatLngArrays['LatLngArray_' + user_id], {color: 'red'});
+    var animatedMarker = L.animatedMarker(cellPath.getLatLngs(),{
+      distance: 500,  // meters
+      interval: 1000, // milliseconds
+      icon: myIcon,
+    });
+
+
+    map.addLayer(animatedMarker);
+    tracks.addTo(map);
+    cellPath.addTo(map)
+    map.fitBounds(tracks.getBounds(), { padding: [50, 50] });
+
+  }
+</script>
+
+</body>
+</html>
