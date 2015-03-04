@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Visualisation for 1 user</title>
+
+  <link rel='stylesheet' href='http://cdn.leafletjs.com/leaflet-0.7/leaflet.css' />
+  <script src='http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js'></script>
+  <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js'></script>
+  <script src='https://code.jquery.com/jquery-2.1.1.js'></script>
+  <script src='data/visualDataSTEM.js'></script>
+  <link rel='stylesheet' type='text/css' href='theme.css'>
+
+</head>
+<body>
+  <p id="timeStampHeader"> '2014-09-02 23:53:45-07:00'</p>
+  <div id="map" style="height: 550px; position: relative;"></div>
+  <div id="overlaya">Visual for 1 user</div>
+
+  <!--form to change the user that we see-->
+  <form NAME="userChoice">
+  	<div>Enter a user number (between 0 and 97)</div>
+      <!--Enter the user number-->
+      <input TYPE="text" NAME="input" VALUE=""><BR>
+      <input TYPE="button" id='submitButton' NAME="bouton" VALUE="Get track for one day" onClick="controle(userChoice)">
+  </form>
+
+    <!--TODO-->
+    <input type='button' value='Faster' onClick='increaseSpeed()' class='button'></input>
+
+  <script type="text/javascript">
+
+    //EDIT 'examples.map-i87786ca' TO CHANGE THE MAPBOX BASE LAYER
+    var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.map-i87786ca/{z}/{x}/{y}.png', {
+      attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+    });
+
+    //Initialize the map, and add the layer
+    var map = L.map('map').addLayer(mapboxTiles);
+    //Add the scale to the map
+    L.control.scale().addTo(map);
+
+    //FIXME can return a color according to the timstamp
+    function getColor(d) {
+      return d > '2014-04-16 9:52:17-07:00'   ? '#00FF00' :
+      '#800026';
+    }
+
+    //Open pop up when click on a point
+    function markerSetup(feature, layer) {
+      if (feature.properties) {
+        layer.bindPopup(feature.properties.timeStamp);
+      }
+    }
+
+    //Return a latlng leaflet element with small randomness to distinguish the points on the same antenna
+    function jitter(latlng) {
+      var lat = latlng.lat + (Math.random()-0.5)/500;
+      var lng = latlng.lng + (Math.random()-0.5)/500;
+      return L.latLng(lat, lng);
+    }
+
+    //Style of the marker
+    function style(feature) {
+      return {
+        fillColor: getColor(feature.properties.timeStamp),
+        weight: 2,
+        radius: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.7
+      };
+    }
+
+    function controle(userChoice) {
+      var user_id = document.userChoice.input.value;
+      putMapForOneUser(user_id);
+    }
+
+    //TODO : implement an interface to manage to speed of the visualisation
+    var speed = 100;
+    var interval = 1;
+    function increaseSpeed(){
+      speed -= 100;
+    }
+
+  function putMapForOneUser(user_id){
+    console.log('Start map for user ' + user_id)
+    var myIcon = L.icon({
+      iconUrl: 'user-red.png'
+    });
+
+
+    var currentArray = dictLatLngArrays['user_' + user_id];
+
+    function doSetTimeout(cellPath,i,timeStamp,current) {
+      console.log(i);
+      setTimeout(function(){
+        cellPath.addTo(map);
+        document.getElementById("timeStampHeader").innerHTML = timeStamp;
+        },speed*i);
+    }
+
+    var biggestDistance = 0;
+    var count = 0;
+
+
+    for(var i = 0; i < currentArray.length - 1;i ++){
+      var current = []
+      current[0] = currentArray[i][0];
+      current[1] = currentArray[i+1][0];
+      var timeStamp = currentArray[i][1];
+      console.log('timeStamp: ' + timeStamp);
+      var cellPath = L.polyline(current, {color: 'red'});
+      cellPath.addTo(map);
+      count += 1;
+    }
+    console.log('Number of points: ' + i);
+
+    var tracks = L.geoJson(dictResults['user_' + user_id], {style: style,
+      onEachFeature: markerSetup,
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(jitter(latlng));
+      }
+    });
+
+    //Focus the map on the points
+
+
+    map.fitBounds(tracks.getBounds(), { padding: [30, 30] });
+    tracks.addTo(map);
+
+  }
+  for (var user = 0; user < 5; user ++){
+    putMapForOneUser(user);
+  }
+  //putMapForOneUser('4');
+</script>
+
+</body>
+</html>
