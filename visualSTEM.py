@@ -3,12 +3,13 @@ import pandas as pd
 import random
 
 #Read a CSV file of 100 users on 04/16
-fnameSTEM = 'data/stem_sample_users_09_02_smaller.csv'
+#fnameSTEM = 'data/stem_sample_users_09_02_smaller.csv'
 fnameSTEM_LA = 'data/stem_LA_sample_users_all_type_6_0902.csv'
 with open(fnameSTEM_LA) as f:
     content = f.readlines()
 print content[0]
 
+"""
 fnameJsSTEM = 'data/visualDataSTEM.js'
 #Choose the user_number we want : 22,34
 with open(fnameJsSTEM, 'wb') as javaScriptFile:
@@ -76,3 +77,5 @@ with open(fnameJsSTEM, 'wb') as javaScriptFile:
         dictResults[varname] = geo_data
     javaScriptFile.write('var ' + 'dictResults' + ' = ' + str(dictResults) + '\n')
     javaScriptFile.write('var ' + 'dictLatLngArrays' + ' = ' + str(dictLatLngArrays) + '\n')
+
+"""
