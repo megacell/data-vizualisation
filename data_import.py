@@ -40,7 +40,8 @@ def csv_to_panda(filepath, add_traj):
 
 
 def remove_static_points(df, deltatime):
-    """Remove consecutive points with same position within deltatime seconds"""
+    """Remove consecutive points with same position within deltatime seconds
+    for one trajectory"""
     if len(df) <= 2: return df
     rows, p1, p2 = [], 0, 1
     while p1 < len(df):
@@ -56,9 +57,12 @@ def remove_static_points(df, deltatime):
 
 
 def filter_data(df):
+    """Remove consecutive points with same position within deltatime seconds
+    and static trajectories"""
     temp = []
     for user_id in df.index.levels[0]:
         print 'filter traj for', user_id
+        if df.loc[user_id]['dist_to_prev'].sum() < 1.0: continue
         filtered_traj = remove_static_points(df.loc[user_id], 300)
         filtered_traj['user_id'] = user_id
         filtered_traj.set_index('user_id', append=True, inplace=True)
@@ -66,19 +70,21 @@ def filter_data(df):
     return pd.concat(temp)
 
 
-def main():
+def save_filtered_data():
     filepath = 'data/stem_LA_sample_users_all_type_6_0902.csv'
     traj_data = csv_to_panda(filepath, add_raw_traj)
-    print 'import complete'
+    print 'import complete, filter data'
     filtered_data = filter_data(traj_data)
-    print traj_data
-    print filtered_data
+    filtered_data.save('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
+
+
+def main():
+    #save_filtered_data()
+    df = pd.load('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
+    for user_id in df.index.levels[0]:
+        print df.loc[user_id]['dist_to_prev'].sum()
     
 
 if __name__ == "__main__":
     main()
 
-"""
-from datetime import datetime
-datetime.strptime(end[11:19], '%H:%M:%S')
-"""

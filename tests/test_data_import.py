@@ -1,5 +1,4 @@
 import unittest
-import argparse
 import pandas as pd
 from data_import import add_raw_traj, csv_to_panda, remove_static_points
 import numpy as np
@@ -28,7 +27,7 @@ class TestDataImport(unittest.TestCase):
         line1 = "23 [[[1.9, -2.4], '2014-09-02 11:10:15-07:00'], [[2.9, -5.4], '2014-09-02 11:14:27-07:00']]"
         line2 = "24 [[[33.9, -8.4], '2014-09-03 21:10:42-07:00'], [[32.9, -7.4], '2014-09-03 21:14:27-07:00'], [[31.4, -6.5], '2014-09-03 21:21:27-07:00']]"
         df = pd.concat([add_raw_traj(line1), add_raw_traj(line2)])
-        self.assert_contents(df) 
+        self.assert_contents(df)
     
 
     def test_add_csv_to_panda(self):
@@ -54,6 +53,25 @@ class TestDataImport(unittest.TestCase):
         self.assertTrue(df.loc[1].tolist() == [6.4, 0.0, 350])
         self.assertTrue(df.loc[2].tolist() == [3.2, 1.0, 280])
         self.assertTrue(df.loc[3].tolist() == [7.8, 2.0, 2])
+
+        data = [[4.2, 0.0, 0.0], [6.4, 0.0, 350], [3.2, 0.0, 280], [3.2, 0.0, 200], [7.8, 2.0, 2]]
+        df = pd.DataFrame(data, index = range(5), columns = columns)
+        df = remove_static_points(df, 300)
+        self.assertTrue(len(df) == 4)
+        self.assertTrue(df.loc[0].tolist() == [4.2, 0., 0.])
+        self.assertTrue(df.loc[1].tolist() == [6.4, 0.0, 350])
+        self.assertTrue(df.loc[2].tolist() == [3.2, 0.0, 480])
+        self.assertTrue(df.loc[3].tolist() == [7.8, 2.0, 2])
+
+        data = [[4.2, 0.0, 0.0], [6.4, 0.0, 350], [3.2, 0.0, 280], [7.8, 2.0, 2]]
+        df = pd.DataFrame(data, index = range(4), columns = columns)
+        df = remove_static_points(df, 300)
+        self.assertTrue(len(df) == 4)
+        self.assertTrue(df.loc[0].tolist() == [4.2, 0., 0.])
+        self.assertTrue(df.loc[1].tolist() == [6.4, 0.0, 350])
+        self.assertTrue(df.loc[2].tolist() == [3.2, 0.0, 280])
+        self.assertTrue(df.loc[3].tolist() == [7.8, 2.0, 2])
+
 
 
 if __name__ == '__main__':
