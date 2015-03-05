@@ -1,0 +1,11 @@
+Feature
+-------
+
+From the page with all the trajectories
+be able to enter a user_id (or sample a random one) and follow display
+it displays trajectory only for the user
+each link can be highlighted with information on speed, time, distance, date
+
+Suggestion:
+  use same view_trajectories.html
+  with another geoJson LinString feature just for one trajectory

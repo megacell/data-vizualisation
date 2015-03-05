@@ -79,10 +79,10 @@ def save_filtered_data():
 
 
 def main():
-    #save_filtered_data()
-    df = pd.load('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
-    for user_id in df.index.levels[0]:
-        print df.loc[user_id]['dist_to_prev'].sum()
+    save_filtered_data()
+    #df = pd.load('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
+    #for user_id in df.index.levels[0]:
+    #    print df.loc[user_id]['dist_to_prev'].sum()
     
 
 if __name__ == "__main__":

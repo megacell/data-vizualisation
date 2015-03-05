@@ -65,7 +65,7 @@ def to_geoJson():
     out += '\n'
     out += 'var lat_center_map = 33.982075\n'
     out += 'var lon_center_map = -118.28104\n'
-    with open('visualization_data/data.js', 'w') as f:
+    with open('visualization_data/all_trajectories.js', 'w') as f:
         f.write(out)
 
 
