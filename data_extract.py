@@ -2,7 +2,7 @@ import pandas as pd
 
 __author__ = 'jeromethai'
 
-begin = 'var geojson_features = [{\n'
+begin = 'var geojson = [{\n'
 
 def begin_feature(type):
     string = '    "type": "Feature",\n    "geometry": {\n'
@@ -54,6 +54,7 @@ def extract_one_trajectory(df, user_id, called_by_extract_all_trajectories=False
     out += prop('duration', duration)
     out += prop('user_id', user_id)
     out += prop('number_points', len(df.loc[user_id]))
+    out += prop('marker-color', '#FF00FF')
     if not called_by_extract_all_trajectories: out += end_prop(False)
     return out
 
