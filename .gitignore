@@ -3,3 +3,4 @@ data/*
 *.pyc
 leaflet_template/*
 visualization_data/*
+!visualization_data/.gitkeep
