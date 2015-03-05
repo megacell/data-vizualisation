@@ -50,10 +50,10 @@ def extract_one_trajectory(df, user_id, called_by_extract_all_trajectories=False
         	duration += row['time_to_prev'] 
     	out += coord(row['lat'], row['lon'], "LineString")
     out += begin_prop
-    out += prop('length', length)
+    out += prop('distance', length)
     out += prop('duration', duration)
     out += prop('user_id', user_id)
-    out += prop('#points', len(df.loc[user_id]))
+    out += prop('number_points', len(df.loc[user_id]))
     if not called_by_extract_all_trajectories: out += end_prop(False)
     return out
 
@@ -81,10 +81,13 @@ def example():
 
 
 def main():
-	df = pd.load('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
-	out = extract_all_trajectories(df)
-	with open('visualization_data/data.js', 'w') as f:
-		f.write(out)
+    df = pd.load('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
+    out = extract_all_trajectories(df)
+    out += '\n'
+    out += 'var lat_center_map = 33.982075\n'
+    out += 'var lon_center_map = -118.28104\n'
+    with open('visualization_data/data.js', 'w') as f:
+        f.write(out)
 
 
 
