@@ -71,8 +71,8 @@ def main():
     traj_data = csv_to_panda(filepath, add_raw_traj)
     print 'import complete'
     filtered_data = filter_data(traj_data)
-    print traj_data.loc['035420522537597']
-    print filtered_data.loc['035420522537597']
+    print traj_data
+    print filtered_data
     
 
 if __name__ == "__main__":
