@@ -7,7 +7,7 @@ fushia: #FF00FF GOOD
 
 var myStyle = {
     color: "#00FFFF",
-    weight: 5,
+    weight: 3,
     opacity: 0.5
 };
 
@@ -23,7 +23,6 @@ var highlightStyle = {
 
 function onEachFeature(feature, layer) {
     // Load the default style. 
-    //layer.setStyle(myStyle);
     // Create a self-invoking function that passes in the layer
     // and the properties associated with this particular record.
     (function(layer, properties) {
