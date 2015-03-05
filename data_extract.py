@@ -39,6 +39,7 @@ def extract_all_trajectories(df):
 def extract_one_trajectory(df, user_id, called_by_extract_all_trajectories=False):
     """create geojson LineString features from trajectories pandas dataframe
     generated in data_import.py"""
+    print 'convert trajectory for user {} to geoJson'.format(user_id)
     out = ''
     if not called_by_extract_all_trajectories: out += begin
     out += begin_feature("LineString")
@@ -56,6 +57,16 @@ def extract_one_trajectory(df, user_id, called_by_extract_all_trajectories=False
     out += prop('number_points', len(df.loc[user_id]))
     if not called_by_extract_all_trajectories: out += end_prop(False)
     return out
+
+
+def to_geoJson():
+    df = pd.load('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
+    out = extract_all_trajectories(df)
+    out += '\n'
+    out += 'var lat_center_map = 33.982075\n'
+    out += 'var lon_center_map = -118.28104\n'
+    with open('visualization_data/data.js', 'w') as f:
+        f.write(out)
 
 
 def example():
@@ -81,13 +92,7 @@ def example():
 
 
 def main():
-    df = pd.load('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
-    out = extract_all_trajectories(df)
-    out += '\n'
-    out += 'var lat_center_map = 33.982075\n'
-    out += 'var lon_center_map = -118.28104\n'
-    with open('visualization_data/data.js', 'w') as f:
-        f.write(out)
+    to_geoJson()
 
 
 

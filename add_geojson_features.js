@@ -40,11 +40,11 @@ function onEachFeature(feature, layer) {
 
     if (feature.properties) {
     	var msg = ""
-    	if (feature.properties.user_id) {
-    	    msg = msg.concat("user_id: ")
-    	    msg = msg.concat(feature.properties.user_id)
-    	    msg = msg.concat("<br>")
-    	}
+    	//if (feature.properties.user_id) {
+    	//    msg = msg.concat("user_id: ")
+    	//    msg = msg.concat(feature.properties.user_id)
+    	//    msg = msg.concat("<br>")
+    	//}
         if (feature.properties.distance) {
             msg = msg.concat("length: ")
     	    msg = msg.concat(feature.properties.distance)
