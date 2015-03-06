@@ -4,5 +4,5 @@ data/*
 leaflet_template/*
 visualization_data/*
 !visualization_data/.gitkeep
-notes.txt
+*.txt
 
