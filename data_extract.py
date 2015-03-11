@@ -1,6 +1,4 @@
-# ================================================
-# Methods to convert STEM data in Panda to geojson
-# ================================================
+
 
 import pandas as pd
 
@@ -82,6 +80,7 @@ def to_geoJson_link():
         out += coord(df.loc[i]['lat1'], df.loc[i]['lon1'], type)
         out += coord(df.loc[i]['lat2'], df.loc[i]['lon2'], type)
         out += begin_prop
+        out += prop('flow', df.loc[i]['flow'])
         out += prop('flow_over_capacity', df.loc[i]['flow/capacity'])
         out += prop('tt_over_fftt', df.loc[i]['travel_time/fftt'])
         out += prop('capacity', df.loc[i]['capacity'])

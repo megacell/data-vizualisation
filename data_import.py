@@ -1,5 +1,6 @@
 import pandas as pd
 from utils import delta_time, distance_on_unit_sphere
+import numpy as np
 
 TOL = 1e-6
 
@@ -111,7 +112,7 @@ def csv_to_panda_link(filepath, savepath, method, columns, skip = False):
     df.save(savepath)
 
 
-def save_link_LA_OSM():
+def save_link_OSM_LA():
     filepath = 'data/OSM_LA.csv'
     savepath = 'data/OSM_LA.pkl'
     skip = True
@@ -121,14 +122,23 @@ def save_link_LA_OSM():
 
 
 
+def add_flow_to_OSM_LA():
+    df = pd.load('data/OSM_LA.pkl')
+    df['flow'] = pd.Series(np.zeros(len(df)), index=df.index)
+    for i in range(len(df)):
+        df.loc[i]['flow'] = df.loc[i]['flow/capacity'] * df.loc[i]['capacity']
+    df.save('data/OSM_LA.pkl')
+
+
 def main():
     #save_filtered_data()
     #df = pd.load('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
     #for user_id in df.index.levels[0]:
     #    print df.loc[user_id]['dist_to_prev'].sum()
-    #save_link_LA_OSM()
-    df = pd.load('data/OSM_LA.pkl')
-    print df
+    save_link_OSM_LA()
+    add_flow_to_OSM_LA()
+    #df = pd.load('data/OSM_LA.pkl')
+    #print df
     
 
 if __name__ == "__main__":
