@@ -1,3 +1,7 @@
+# ================================================
+# Methods to convert STEM data in Panda to geojson
+# ================================================
+
 import pandas as pd
 
 __author__ = 'jeromethai'
@@ -59,7 +63,7 @@ def extract_one_trajectory(df, user_id, called_by_extract_all_trajectories=False
     return out
 
 
-def to_geoJson():
+def to_geoJson_traj():
     df = pd.load('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
     out = extract_all_trajectories(df)
     out += '\n'
@@ -67,6 +71,34 @@ def to_geoJson():
     out += 'var lon_center_map = -118.28104\n'
     with open('visualization_data/all_trajectories.js', 'w') as f:
         f.write(out)
+
+
+def to_geoJson_link():
+    df = pd.load('data/OSM_LA.pkl')
+    type = 'LineString'
+    out = begin
+    for i in range(len(df)):
+        out += begin_feature(type)
+        out += coord(df.loc[i]['lat1'], df.loc[i]['lon1'], type)
+        out += coord(df.loc[i]['lat2'], df.loc[i]['lon2'], type)
+        out += begin_prop
+        out += prop('flow_over_capacity', df.loc[i]['flow/capacity'])
+        out += prop('tt_over_fftt', df.loc[i]['travel_time/fftt'])
+        out += prop('capacity', df.loc[i]['capacity'])
+        out += prop('freespeed', df.loc[i]['freespeed'])
+        out += prop('length', df.loc[i]['length'])
+        out += prop('fftt', df.loc[i]['fftt'])
+        if i < len(df)-1:
+            out += end_prop(next = True)
+        else:
+            out += end_prop(next = False)
+    out += '\n'
+    out += 'var lat_center_map = 33.982075\n'
+    out += 'var lon_center_map = -118.28104\n'
+    with open('visualization_data/OSM_LA.js', 'w') as f:
+        f.write(out)
+
+
 
 
 def example():
@@ -79,7 +111,7 @@ def example():
         f.write(begin_prop)
         f.write(prop('name1', 'value1'))
         f.write(prop('name2', 'value2'))
-        f.write(end_prop(True))
+        f.write(end_prop(next = True))
         f.write(begin_feature(type))
         f.write(coord(33.974394, -118.308914, type))
         f.write(coord(33.974465, -118.300266, type))
@@ -87,12 +119,13 @@ def example():
         f.write(begin_prop)
         f.write(prop('name1', 'value1'))
         f.write(prop('name2', 'value2'))
-        f.write(end_prop(False))
+        f.write(end_prop(next = False))
 
 
 
 def main():
-    to_geoJson()
+    #to_geoJson_traj()
+    to_geoJson_link()
 
 
 

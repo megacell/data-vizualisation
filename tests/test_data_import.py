@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from data_import import add_raw_traj, csv_to_panda, remove_static_points
+from data_import import add_raw_traj, csv_to_panda_traj, remove_static_points
 import numpy as np
 from utils import delta_time, distance_on_unit_sphere
 
@@ -30,8 +30,8 @@ class TestDataImport(unittest.TestCase):
         self.assert_contents(df)
     
 
-    def test_add_csv_to_panda(self):
-        df = csv_to_panda('tests/sample_data.csv', add_raw_traj)
+    def test_add_csv_to_panda_traj(self):
+        df = csv_to_panda_traj('tests/sample_data.csv', add_raw_traj)
         self.assert_contents(df)
 
 

@@ -5,8 +5,16 @@ TOL = 1e-6
 
 __author__ = 'jeromethai'
 
+
+# ============================
+# Methods to extract STEM data
+# ============================
+
+
 def add_raw_traj(line):
-    """create panda dataframe with trajectory of one user"""
+    """create panda dataframe with trajectory of one user
+    from the STEM dataset
+    """
     p = line.find('[')
     user_id = line[:p-1]
     rows = [] 
@@ -31,12 +39,14 @@ def add_raw_traj(line):
     return df
 
 
-def csv_to_panda(filepath, add_traj):
-    """Import the whole csv into panda"""
+def csv_to_panda_traj(filepath, method):
+    """Import the whole csv into panda using method that matches the csv format
+    """
     list_df = []
     with open(filepath) as f:
-        for i, line in enumerate(f): list_df.append(add_traj(line))
+        for i, line in enumerate(f): list_df.append(method(line))
     return pd.concat(list_df)
+
 
 
 def remove_static_points(df, deltatime):
@@ -72,17 +82,53 @@ def filter_data(df):
 
 def save_filtered_data():
     filepath = 'data/stem_LA_sample_users_all_type_6_0902.csv'
-    traj_data = csv_to_panda(filepath, add_raw_traj)
+    traj_data = csv_to_panda_traj(filepath, add_raw_traj)
     print 'import complete, filter data'
     filtered_data = filter_data(traj_data)
     filtered_data.save('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
 
 
+
+# ===================================
+# Methods to extract data from OSM_LA
+# ===================================
+
+def read_link(line):
+    """read link 
+    """
+    return [float(e) for e in line.split(';')]
+
+
+def csv_to_panda_link(filepath, savepath, method, columns, skip = False):
+    """Import and save the whole csv into panda using method that matches the csv format
+    """
+    links = []
+    with open(filepath) as f:
+        for i, line in enumerate(f):
+            if i == 0 and skip: continue
+            links.append(method(line))
+    df = pd.DataFrame(links, columns = columns)
+    df.save(savepath)
+
+
+def save_link_LA_OSM():
+    filepath = 'data/OSM_LA.csv'
+    savepath = 'data/OSM_LA.pkl'
+    skip = True
+    columns = ['lon1', 'lat1', 'lon2', 'lat2', 'flow/capacity',
+            'travel_time/fftt', 'capacity', 'freespeed', 'length', 'fftt']
+    csv_to_panda_link(filepath, savepath, read_link, columns, skip)
+
+
+
 def main():
-    save_filtered_data()
+    #save_filtered_data()
     #df = pd.load('data/filtered_stem_LA_sample_users_all_type_6_0902.pkl')
     #for user_id in df.index.levels[0]:
     #    print df.loc[user_id]['dist_to_prev'].sum()
+    #save_link_LA_OSM()
+    df = pd.load('data/OSM_LA.pkl')
+    print df
     
 
 if __name__ == "__main__":

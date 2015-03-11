@@ -50,6 +50,26 @@ function onEachFeature(feature, layer) {
     	    msg = msg.concat(feature.properties.number_points)
     	    msg = msg.concat("<br>")
         }
+        if (feature.properties.flow_over_capacity) {
+            msg = msg.concat("flow/capacity: ")
+            msg = msg.concat(feature.properties.flow_over_capacity)
+            msg = msg.concat("<br>")
+        }
+        if (feature.properties.tt_over_fftt) {
+            msg = msg.concat("tt/fftt: ")
+            msg = msg.concat(feature.properties.tt_over_fftt)
+            msg = msg.concat("<br>")
+        }
+        if (feature.properties.capacity) {
+            msg = msg.concat("capacity: ")
+            msg = msg.concat(feature.properties.capacity)
+            msg = msg.concat("<br>")
+        }
+        if (feature.properties.freespeed) {
+            msg = msg.concat("freespeed: ")
+            msg = msg.concat(feature.properties.freespeed)
+            msg = msg.concat("<br>")
+        }
         layer.bindPopup(msg);
     }
 };
